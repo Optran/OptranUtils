@@ -86,7 +86,6 @@ public class RandomAccessPage implements Page {
 		}
 		try {
 			pagedFile.writePage(this);
-			dirty = false;
 			return true;
 		} catch (IOException e) {
 			return false;
