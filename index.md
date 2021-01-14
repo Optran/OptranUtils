@@ -1,37 +1,16 @@
-## Welcome to GitHub Pages
+## Welcome to OptranUtils
 
-You can use the [editor on GitHub](https://github.com/Optran/OptranUtils/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+This repository contains utilities that can be used to make programming in java for quick POC/analytical tasks easier. The following are some of the features present in this library.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### Index
+- PagedFile
+- PagedRandomAccessFile
 
-### Markdown
+### PagedFile
+When dealing with a persistent data, and when it is required that the file may be processed out of sequence, we need something like the RandomAccessFile that allows us to jump around inside the file. To simplify data location and access further, it is better to think of a file as a series of "Blocks" or "Pages" of a fixed length.
+The PagedFile interface offers exactly this. There are two implimentations of this interface supplied in this library namely.
+- **RandomAccessPagedFile:** This implementation makes changes to the file directly on the disk so that any changes made by you are persisted immidiately. (close() still needs to be called to ensure all changes were persisted.)
+- **LRUCachePagedFile:** This implementation uses the RandomAccessPagedFile, but adds a caching layer where the user can specify the number of pages to cache. It is necessary then when persisting the changes to invoke the close() method to persist the changes, and if the system has some idle time flush() can be invoked to persist any pages that have not yet been written.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Optran/OptranUtils/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+## PagedRandomAccessFile
+If one happens to be  dealing with random access files but also wants to leverage caching for better performance, this is the class that allows that. Internally it makes use of the PagedFile to help reduce the amount of Disk IO required to perform a task.
