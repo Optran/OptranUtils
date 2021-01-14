@@ -81,6 +81,16 @@ public class RandomAccessPagedFile implements PagedFile {
 	public void writePage(Page page) throws IOException {
 		raf.seek(page.getPageId() * pageData.length);
 		raf.write(page.getData());
+		page.clean();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * As this class directly updates the file on the disk this method does nothing.
+	 */
+	@Override
+	public void flush() {
 	}
 
 	/**

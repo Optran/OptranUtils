@@ -52,6 +52,12 @@ public interface PagedFile {
 	public void writePage(Page page) throws IOException;
 
 	/**
+	 * This method flushes any data that has not yet been written to the disk, to the
+	 * disk.
+	 */
+	public void flush() throws IOException;
+
+	/**
 	 * Closes the file that is being used to persist data. Any calls made to this
 	 * instance (other than close itself) post the invocation of close will result
 	 * in a {@link NullPointerException}
