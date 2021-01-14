@@ -26,7 +26,6 @@ package com.github.optran.utils.pagedfile;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
@@ -34,14 +33,14 @@ import org.apache.log4j.Logger;
 
 import com.github.optran.utils.exceptions.IncorrectInitializationValueException;
 
-public class LRUCachedPagedFile implements PagedFile {
-	private static final Logger logger = Logger.getLogger(Test.class);
+public class LRUCachePagedFile implements PagedFile {
+	private static final Logger logger = Logger.getLogger(LRUCachePagedFile.class);
 	private PagedFile pagedFile;
 	private int cacheSize;
 	private Map<Long, Page> cacheMap;
 	private Queue<Page> lruQueue;
 
-	public LRUCachedPagedFile(PagedFile pagedFile, int cacheSize) {
+	public LRUCachePagedFile(PagedFile pagedFile, int cacheSize) {
 		if(cacheSize<=0) {
 			throw new IncorrectInitializationValueException("Incorrect cache size value. cacheSize = "+cacheSize);
 		}
@@ -125,8 +124,10 @@ public class LRUCachedPagedFile implements PagedFile {
 			lruQueue.clear();
 			cacheMap = null;
 			lruQueue = null;
+			boolean retVal = true;
+			retVal = pagedFile.close();
 			this.pagedFile = null;
-			return pagedFile.close();
+			return retVal;
 		} catch (IOException e) {
 			return false;
 		}

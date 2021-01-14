@@ -27,7 +27,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import org.apache.log4j.Logger;
+
 public class RandomAccessPagedFile implements PagedFile {
+	private static final Logger logger = Logger.getLogger(RandomAccessPagedFile.class);
 	private RandomAccessFile raf;
 	private byte[] pageData;
 
@@ -82,6 +85,7 @@ public class RandomAccessPagedFile implements PagedFile {
 		raf.seek(page.getPageId() * pageData.length);
 		raf.write(page.getData());
 		page.clean();
+		logger.trace("Wrote page ("+page.getPageId()+") to disk.");
 	}
 
 	/**
