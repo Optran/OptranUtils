@@ -157,9 +157,15 @@ public class RandomAccessPage implements Page {
 		if (null == value) {
 			return numBytesRead;
 		}
-		for (int i = 0, readValue = read(); readValue >= 0 && i < value.length; i++) {
-			value[i] = (byte) readValue;
-			numBytesRead++;
+		int readValue = 0;
+		for (int i = 0; i < value.length; i++) {
+			readValue = read();
+			if(readValue >= 0) {
+				value[i] = (byte) readValue;
+				numBytesRead++;
+			} else {
+				break;
+			}
 		}
 		return numBytesRead;
 	}
