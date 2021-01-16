@@ -3,8 +3,31 @@
 This repository contains utilities that can be used to make programming in java for quick POC/analytical tasks easier. The following are some of the features present in this library.
 
 ### Index
+- Usage
 - PagedFile
 - PagedRandomAccessFile
+
+### Usage
+
+Add the following repository to your maven pom file:
+``` xml
+<repositories>
+	<repository>
+		<id>Optran</id>
+		<url>https://raw.githubusercontent.com/Optran/OptranUtils/repository</url>
+	</repository>
+</repositories>
+```
+
+And add the following dependency
+
+``` xml
+<dependency>
+	<groupId>com.github.optran.utils</groupId>
+	<artifactId>OptranUtils</artifactId>
+	<version>21.1.16-ALPHA</version>
+</dependency>
+```
 
 ### PagedFile
 When dealing with a persistent data, and when it is required that the file may be processed out of sequence, we need something like the RandomAccessFile that allows us to jump around inside the file. To simplify data location and access further, it is better to think of a file as a series of "Blocks" or "Pages" of a fixed length.
@@ -35,5 +58,5 @@ System.out.println(new String(data, StandardCharsets.UTF_8));
 pagedFile.close();
 ```
 
-## PagedRandomAccessFile
+### PagedRandomAccessFile
 If one happens to be  dealing with random access files but also wants to leverage caching for better performance, this is the class that allows that. Internally it makes use of the PagedFile to help reduce the amount of Disk IO required to perform a task.
