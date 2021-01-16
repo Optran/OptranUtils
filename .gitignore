@@ -8,3 +8,4 @@
 # Generated classes
 target/*
 
+/target/

@@ -38,7 +38,8 @@ public interface PagedFile {
 	 * 
 	 * @param pageNumber The index of the {@link Page} to be fetched.
 	 * @return The {@link Page} at the specified index.
-	 * @throws IOException
+	 * @throws IOException If an IO exception is thrown when interacting with the
+	 *                     file layer.
 	 */
 	public Page readPage(long pageNumber) throws IOException;
 
@@ -46,14 +47,14 @@ public interface PagedFile {
 	 * Writes the {@link Page} that has been provided.
 	 * 
 	 * @param page The {@link Page} to be written.
-	 * @return True if the write was successful, false otherwise.
-	 * @throws IOException
+	 * @throws IOException If an IO exception is thrown when interacting with the
+	 *                     file layer.
 	 */
 	public void writePage(Page page) throws IOException;
 
 	/**
-	 * This method flushes any data that has not yet been written to the disk, to the
-	 * disk.
+	 * This method flushes any data that has not yet been written to the disk, to
+	 * the disk.
 	 */
 	public void flush() throws IOException;
 

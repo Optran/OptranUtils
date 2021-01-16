@@ -54,7 +54,7 @@ public interface Page {
 	 * Returns true if the page has been modified, and the changes have not yet been
 	 * persisted to the disk.
 	 * 
-	 * @return
+	 * @return True if the page is dirty, false otherwise.
 	 */
 	public boolean isDirty();
 
@@ -78,7 +78,7 @@ public interface Page {
 	/**
 	 * Returns the current position of the head in the page.
 	 * 
-	 * @return
+	 * @return The current location of the page head.
 	 */
 	public int getHead();
 
@@ -86,7 +86,7 @@ public interface Page {
 	 * Sets the read head to the specified offset. All subsequent reads will take
 	 * place from this offset.
 	 * 
-	 * @param head
+	 * @param head The location in the page to which the page head must be set.
 	 */
 	public void setHead(int head);
 

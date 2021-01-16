@@ -62,7 +62,8 @@ public class RandomAccessPagedFile implements PagedFile {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @throws IOException
+	 * @throws IOException If an IO exception is thrown when interacting with the
+	 *                     file layer.
 	 */
 	@Override
 	public Page readPage(long pageNumber) throws IOException {
@@ -78,14 +79,15 @@ public class RandomAccessPagedFile implements PagedFile {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @throws IOException
+	 * @throws IOException If an IO exception is thrown when interacting with the
+	 *                     file layer.
 	 */
 	@Override
 	public void writePage(Page page) throws IOException {
 		raf.seek(page.getPageId() * pageData.length);
 		raf.write(page.getData());
 		page.clean();
-		logger.trace("Wrote page ("+page.getPageId()+") to disk.");
+		logger.trace("Wrote page (" + page.getPageId() + ") to disk.");
 	}
 
 	/**
