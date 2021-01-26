@@ -4,6 +4,7 @@ This repository contains utilities that can be used to make programming in java 
 
 ### Index
 - Usage
+- DataSet
 - PagedFile
 - PagedRandomAccessFile
 
