@@ -25,8 +25,29 @@ And add the following dependency
 <dependency>
 	<groupId>com.github.optran.utils</groupId>
 	<artifactId>OptranUtils</artifactId>
-	<version>21.1.16-ALPHA</version>
+	<version>21.1.26-ALPHA</version>
 </dependency>
+```
+### DataSet
+Often when we are working with data, we need to store data in such a way that can be accessed again and again. Across different analysis tasks this data must not change, even though more data may be added to it. It is also necessary to be able to navigate this data in any direction, forward or reverse. This functionality is provided by the DataSetIO class. This class is created using the DataSetIOBuilder class and can create multiple consumers and producers for a given DataSet. These consumers & producers can then be used to read and write data to and from the DataSet. Consumers and Producers may each be passed to different threads and will work without causing any issues (For now consumers do not have the feature to wait for data to become available once a producer has written something to the DataSet but this will be added in the future). Example usage of this class is as follows:-
+
+``` Java
+File file = new File("DataSet.ds");
+DataSetIO dataSetIO = new DataSetIOBuilder()
+			.withFile(file)			//If this parameter is not provided a temporary file will be created in the users temp directory.
+			.withCacheSize(100)		//Sets the number of pages to cache in memory, if this is not provided caching will be disabled.
+			.withPageSize(100)		//If a value less than 10 is provided here or this is not set, a default page size of 65536 is used.
+			.build();
+DataSetConsumer consumer = dataSetIO.createConsumer();
+DataSetProducer producer = dataSetIO.createProducer();
+producer.writeString("Hello");
+producer.write("World".getBytes(StandardCharsets.UTF_8));
+while(consumer.next()) {
+	System.out.println(consumer.readString());	//read will read a byte[] and readString will convert to string before returning
+}
+dataSetIO.closeProducer(producer);			//Commits any records added to the DataSet by any producer, not just this one.
+							//producer.commit(); achieves the same effect as of now.
+dataSetIO.closeConsumer(consumer);
 ```
 
 ### PagedFile
