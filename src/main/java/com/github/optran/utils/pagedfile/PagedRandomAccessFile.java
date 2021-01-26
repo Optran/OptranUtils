@@ -39,6 +39,12 @@ public class PagedRandomAccessFile {
 	private int pageSize;
 	private PagedFile pagedFile;
 
+	public PagedRandomAccessFile(PagedFile pagedFile) {
+		head = 0;
+		this.pagedFile = pagedFile;
+		pageSize = pagedFile.getPageSize();
+	}
+
 	public PagedRandomAccessFile(File target, int pageSize) throws IOException {
 		head = 0;
 		this.pageSize = pageSize;
@@ -96,6 +102,14 @@ public class PagedRandomAccessFile {
 			bytesWritten++;
 		}
 		return bytesWritten;
+	}
+
+	public boolean exists() {
+		return pagedFile.exists();
+	}
+
+	public void flush() throws IOException {
+		pagedFile.flush();
 	}
 
 	public void close() {

@@ -50,7 +50,7 @@ public class RandomAccessPageTest {
 
 	@Test
 	public void initTest() {
-		byte[]data = page.getData();
+		byte[] data = page.getData();
 		assertEquals(10, data.length);
 		for (int i = 0; i < data.length; i++) {
 			assertEquals(0, data[i]);
@@ -69,14 +69,14 @@ public class RandomAccessPageTest {
 	public void readTest() {
 		page.write("ashutoshwad".getBytes(StandardCharsets.UTF_8));
 		page.setHead(0);
-		byte[]data = new byte[8];
+		byte[] data = new byte[8];
 		page.read(data);
 		assertEquals("ashutosh", new String(data, StandardCharsets.UTF_8));
 
 		page.setHead(0);
 		data = new byte[12];
-		data[10]=' ';
-		data[11]=' ';
+		data[10] = ' ';
+		data[11] = ' ';
 		page.read(data);
 		assertEquals("ashutoshwa  ", new String(data, StandardCharsets.UTF_8));
 	}
@@ -84,16 +84,17 @@ public class RandomAccessPageTest {
 	@Test
 	public void writeTest() {
 		page.write("ashutoshwad".getBytes(StandardCharsets.UTF_8));
-		assertEquals("ashutoshwa", new String(page.getData(), StandardCharsets.UTF_8));		
+		assertEquals("ashutoshwa", new String(page.getData(), StandardCharsets.UTF_8));
 	}
 
 	@Test
 	public void writeTestHead() {
 		page.setHead(1);
 		page.write("ashutoshwad".getBytes(StandardCharsets.UTF_8));
-		byte[]data = new byte[9];
+		byte[] data = new byte[9];
 		page.setHead(1);
-		assertEquals(9, page.read(data));;
+		assertEquals(9, page.read(data));
+		;
 		String result = new String(data, StandardCharsets.UTF_8);
 		assertEquals("ashutoshw", result);
 
@@ -101,7 +102,8 @@ public class RandomAccessPageTest {
 		page.setHead(0);
 		page.write("optran".getBytes(StandardCharsets.UTF_8));
 		page.setHead(0);
-		assertEquals(10, page.read(data));;
+		assertEquals(10, page.read(data));
+		;
 		result = new String(data, StandardCharsets.UTF_8);
 		assertEquals("optranoshw", result);
 		assertTrue(page.isDirty());
@@ -135,10 +137,11 @@ public class RandomAccessPageTest {
 	}
 
 	@Test
-	public void testValidityForHeadLessThan0() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	public void testValidityForHeadLessThan0() throws NoSuchMethodException, SecurityException, IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException {
 		Method isHeadValid = page.getClass().getDeclaredMethod("isHeadValid", int.class);
 		isHeadValid.setAccessible(true);
-		assertFalse((boolean)isHeadValid.invoke(page, -1));
+		assertFalse((boolean) isHeadValid.invoke(page, -1));
 	}
 
 	@Test
@@ -149,21 +152,31 @@ public class RandomAccessPageTest {
 		page.flush();
 		assertTrue(pagedFileTest.isInvokeWritePage());
 		page = new RandomAccessPage(2, new byte[10], new PagedFile() {
-			
+
 			@Override
 			public void writePage(Page page) throws IOException {
 				throw new IOException();
 			}
-			
+
 			@Override
 			public Page readPage(long pageNumber) throws IOException {
 				return null;
 			}
-			
+
+			@Override
+			public boolean exists() {
+				return true;
+			}
+
+			@Override
+			public int getPageSize() {
+				return 0;
+			}
+
 			@Override
 			public void flush() throws IOException {
 			}
-			
+
 			@Override
 			public boolean close() {
 				return false;
@@ -182,7 +195,7 @@ public class RandomAccessPageTest {
 		public PagedFileTest() {
 			init();
 		}
-	
+
 		public void init() {
 			this.invokeReadPage = false;
 			this.invokeWritePage = false;
@@ -243,6 +256,15 @@ public class RandomAccessPageTest {
 			invokeWritePage = true;
 			return invokeWritePage;
 		}
-		
-	} 
+
+		@Override
+		public boolean exists() {
+			return true;
+		}
+
+		@Override
+		public int getPageSize() {
+			return 0;
+		}
+	}
 }

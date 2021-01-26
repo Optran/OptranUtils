@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.optran.utils</groupId>
 	<artifactId>OptranUtils</artifactId>
-	<version>21.1.16-ALPHA</version>
+	<version>21.1.26-ALPHA</version>
 	<name>OptranUtils</name>
 	<description>Utility API's to make development in JAVA easier</description>
 	<properties>

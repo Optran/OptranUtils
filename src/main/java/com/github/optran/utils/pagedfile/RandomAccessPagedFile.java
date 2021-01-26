@@ -24,6 +24,7 @@
 package com.github.optran.utils.pagedfile;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
@@ -31,6 +32,7 @@ import org.apache.log4j.Logger;
 
 public class RandomAccessPagedFile implements PagedFile {
 	private static final Logger logger = Logger.getLogger(RandomAccessPagedFile.class);
+	private File target;
 	private RandomAccessFile raf;
 	private byte[] pageData;
 
@@ -43,6 +45,7 @@ public class RandomAccessPagedFile implements PagedFile {
 			throw new IOException("The page size provided is too small. pageSize = " + pageSize);
 		}
 		pageData = new byte[pageSize];
+		this.target = target;
 		raf = new RandomAccessFile(target, "rws");
 	}
 
@@ -59,6 +62,13 @@ public class RandomAccessPagedFile implements PagedFile {
 		return null;
 	}
 
+	private void initRaf() throws FileNotFoundException {
+		if(null!=raf) {
+			return;
+		}
+		raf = new RandomAccessFile(target, "rws");
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -67,6 +77,7 @@ public class RandomAccessPagedFile implements PagedFile {
 	 */
 	@Override
 	public Page readPage(long pageNumber) throws IOException {
+		initRaf();
 		for (int i = 0; i < pageData.length; i++) {
 			pageData[i] = 0;
 		}
@@ -84,10 +95,19 @@ public class RandomAccessPagedFile implements PagedFile {
 	 */
 	@Override
 	public void writePage(Page page) throws IOException {
+		initRaf();
 		raf.seek(page.getPageId() * pageData.length);
 		raf.write(page.getData());
 		page.clean();
 		logger.trace("Wrote page (" + page.getPageId() + ") to disk.");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int getPageSize() {
+		return pageData.length;
 	}
 
 	/**
@@ -103,10 +123,15 @@ public class RandomAccessPagedFile implements PagedFile {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public boolean exists() {
+		return target.exists();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean close() {
-		if (null == raf) {
-			return true;
-		}
 		try {
 			raf.close();
 			raf = null;

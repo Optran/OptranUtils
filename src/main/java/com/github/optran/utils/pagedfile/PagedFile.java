@@ -53,10 +53,25 @@ public interface PagedFile {
 	public void writePage(Page page) throws IOException;
 
 	/**
+	 * This function returns the size of any single page that is/can be read from
+	 * this file.
+	 * 
+	 * @return The size of any single page in this file.
+	 */
+	public int getPageSize();
+
+	/**
 	 * This method flushes any data that has not yet been written to the disk, to
 	 * the disk.
 	 */
 	public void flush() throws IOException;
+
+	/**
+	 * This method checks if the underlying {@link PagedFile} actually exists.
+	 * 
+	 * @return
+	 */
+	public boolean exists();
 
 	/**
 	 * Closes the file that is being used to persist data. Any calls made to this

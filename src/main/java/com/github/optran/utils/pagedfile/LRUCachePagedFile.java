@@ -103,6 +103,14 @@ public class LRUCachePagedFile implements PagedFile {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public int getPageSize() {
+		return pagedFile.getPageSize();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void flush() throws IOException {
 		for (Page page : lruQueue) {
 			if(page.isDirty()) {
@@ -117,16 +125,21 @@ public class LRUCachePagedFile implements PagedFile {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public boolean exists() {
+		return pagedFile.exists();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean close() {
 		try {
 			flush();
 			cacheMap.clear();
 			lruQueue.clear();
-			cacheMap = null;
-			lruQueue = null;
 			boolean retVal = true;
 			retVal = pagedFile.close();
-			this.pagedFile = null;
 			return retVal;
 		} catch (IOException e) {
 			return false;
