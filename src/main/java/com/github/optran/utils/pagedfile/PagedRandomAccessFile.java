@@ -48,13 +48,13 @@ public class PagedRandomAccessFile {
 	public PagedRandomAccessFile(File target, int pageSize) throws IOException {
 		head = 0;
 		this.pageSize = pageSize;
-		pagedFile = new RandomAccessPagedFile(target, pageSize);
+		pagedFile = new StandardPagedFile(target, pageSize);
 	}
 
 	public PagedRandomAccessFile(File target, int pageSize, int cacheSize) throws IOException {
 		head = 0;
 		this.pageSize = pageSize;
-		pagedFile = new LRUCachePagedFile(new RandomAccessPagedFile(target, pageSize), cacheSize);
+		pagedFile = new LRUCachePagedFile(new StandardPagedFile(target, pageSize), cacheSize);
 	}
 
 	public long getHead() {
@@ -90,6 +90,7 @@ public class PagedRandomAccessFile {
 		page.setHead((int) (head % pageSize));
 		page.write(value);
 		head++;
+		pagedFile.writePage(page);
 	}
 
 	public int write(byte[] data) throws IOException {

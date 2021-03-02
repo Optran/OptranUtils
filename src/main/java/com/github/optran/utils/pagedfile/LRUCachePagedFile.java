@@ -32,6 +32,7 @@ import java.util.Queue;
 import org.apache.log4j.Logger;
 
 import com.github.optran.utils.exceptions.IncorrectInitializationValueException;
+import com.github.optran.utils.exceptions.NotImplementedException;
 
 public class LRUCachePagedFile implements PagedFile {
 	private static final Logger logger = Logger.getLogger(LRUCachePagedFile.class);
@@ -62,7 +63,7 @@ public class LRUCachePagedFile implements PagedFile {
 			return page;
 		}
 		page = pagedFile.readPage(pageNumber);
-		page = new RandomAccessPage(page.getPageId(), page.getData(), this);
+		page = new StandardPage(page.getPageId(), page.getData());
 		updateCache(page);
 		return page;
 	}
@@ -105,6 +106,21 @@ public class LRUCachePagedFile implements PagedFile {
 	@Override
 	public int getPageSize() {
 		return pagedFile.getPageSize();
+	}
+
+	@Override
+	public Page allocPage() throws IOException {
+		return pagedFile.allocPage();
+	}
+
+	@Override
+	public Page extendPage(Page page) throws IOException {
+		return pagedFile.extendPage(page);
+	}
+
+	@Override
+	public boolean freePage(Page page) throws IOException {
+		return pagedFile.freePage(page);
 	}
 
 	/**

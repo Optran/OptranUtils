@@ -23,24 +23,20 @@
 */
 package com.github.optran.utils.pagedfile;
 
-import java.io.IOException;
-
-public class RandomAccessPage implements Page {
+public class StandardPage implements Page {
 	private long pageId;
 	private int size;
 	private byte[] pageData;
 	private int head;
 	private boolean dirty;
-	private PagedFile pagedFile;
 
-	public RandomAccessPage(long pageId, byte[] pageData, PagedFile pagedFile) {
+	public StandardPage(long pageId, byte[] pageData) {
 		this.pageId = pageId;
 		this.size = pageData.length;
 		this.pageData = new byte[pageData.length];
 		for (int i = 0; i < pageData.length; i++) {
 			this.pageData[i] = pageData[i];
 		}
-		this.pagedFile = pagedFile;
 		this.head = 0;
 	}
 
@@ -74,22 +70,6 @@ public class RandomAccessPage implements Page {
 	@Override
 	public boolean isDirty() {
 		return dirty;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean flush() {
-		if (!dirty) {
-			return true;
-		}
-		try {
-			pagedFile.writePage(this);
-			return true;
-		} catch (IOException e) {
-			return false;
-		}
 	}
 
 	/**

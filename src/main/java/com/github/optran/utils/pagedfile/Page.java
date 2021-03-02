@@ -59,14 +59,6 @@ public interface Page {
 	public boolean isDirty();
 
 	/**
-	 * Persists changes if any to the disk, and sets the status of the page to
-	 * clean.
-	 * 
-	 * @return True if the operation was a success, false otherwise.
-	 */
-	public boolean flush();
-
-	/**
 	 * This method gets a copy of the data currently held by this page. The data
 	 * returned is a copy, so edits made to the data that is returned will not
 	 * impact the state of the page.

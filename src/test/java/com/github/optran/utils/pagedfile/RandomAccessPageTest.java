@@ -27,7 +27,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
@@ -39,13 +38,11 @@ import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 public class RandomAccessPageTest {
-	private RandomAccessPage page = null;
-	private PagedFileTest pagedFileTest;
+	private StandardPage page = null;
 
 	@Before
 	public void before() {
-		pagedFileTest = new PagedFileTest();
-		page = new RandomAccessPage(1, new byte[10], pagedFileTest);
+		page = new StandardPage(1, new byte[10]);
 	}
 
 	@Test
@@ -144,127 +141,4 @@ public class RandomAccessPageTest {
 		assertFalse((boolean) isHeadValid.invoke(page, -1));
 	}
 
-	@Test
-	public void testFlush() {
-		page.flush();
-		assertFalse(pagedFileTest.isInvokeWritePage());
-		page.write("ashutosh".getBytes());
-		page.flush();
-		assertTrue(pagedFileTest.isInvokeWritePage());
-		page = new RandomAccessPage(2, new byte[10], new PagedFile() {
-
-			@Override
-			public void writePage(Page page) throws IOException {
-				throw new IOException();
-			}
-
-			@Override
-			public Page readPage(long pageNumber) throws IOException {
-				return null;
-			}
-
-			@Override
-			public boolean exists() {
-				return true;
-			}
-
-			@Override
-			public int getPageSize() {
-				return 0;
-			}
-
-			@Override
-			public void flush() throws IOException {
-			}
-
-			@Override
-			public boolean close() {
-				return false;
-			}
-		});
-		page.write("ashutosh".getBytes());
-		assertFalse(page.flush());
-	}
-
-	private class PagedFileTest implements PagedFile {
-		boolean invokeReadPage;
-		boolean invokeWritePage;
-		boolean invokeFlush;
-		boolean invokeClose;
-
-		public PagedFileTest() {
-			init();
-		}
-
-		public void init() {
-			this.invokeReadPage = false;
-			this.invokeWritePage = false;
-			this.invokeFlush = false;
-			this.invokeClose = false;
-		}
-
-		public boolean isInvokeReadPage() {
-			return invokeReadPage;
-		}
-
-		public void setInvokeReadPage(boolean invokeReadPage) {
-			this.invokeReadPage = invokeReadPage;
-		}
-
-		public boolean isInvokeWritePage() {
-			return invokeWritePage;
-		}
-
-		public void setInvokeWritePage(boolean invokeWritePage) {
-			this.invokeWritePage = invokeWritePage;
-		}
-
-		public boolean isInvokeFlush() {
-			return invokeFlush;
-		}
-
-		public void setInvokeFlush(boolean invokeFlush) {
-			this.invokeFlush = invokeFlush;
-		}
-
-		public boolean isInvokeClose() {
-			return invokeClose;
-		}
-
-		public void setInvokeClose(boolean invokeClose) {
-			this.invokeClose = invokeClose;
-		}
-
-		@Override
-		public Page readPage(long pageNumber) throws IOException {
-			invokeReadPage = true;
-			return null;
-		}
-
-		@Override
-		public void writePage(Page page) throws IOException {
-			invokeWritePage = true;
-		}
-
-		@Override
-		public void flush() throws IOException {
-			invokeWritePage = true;
-		}
-
-		@Override
-		public boolean close() {
-			invokeWritePage = true;
-			return invokeWritePage;
-		}
-
-		@Override
-		public boolean exists() {
-			return true;
-		}
-
-		@Override
-		public int getPageSize() {
-			return 0;
-		}
-	}
 }

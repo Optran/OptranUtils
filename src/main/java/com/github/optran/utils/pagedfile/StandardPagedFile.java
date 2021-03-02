@@ -30,13 +30,15 @@ import java.io.RandomAccessFile;
 
 import org.apache.log4j.Logger;
 
-public class RandomAccessPagedFile implements PagedFile {
-	private static final Logger logger = Logger.getLogger(RandomAccessPagedFile.class);
+import com.github.optran.utils.exceptions.NotImplementedException;
+
+public class StandardPagedFile implements PagedFile {
+	private static final Logger logger = Logger.getLogger(StandardPagedFile.class);
 	private File target;
 	private RandomAccessFile raf;
 	private byte[] pageData;
 
-	public RandomAccessPagedFile(File target, int pageSize) throws IOException {
+	public StandardPagedFile(File target, int pageSize) throws IOException {
 		String errorMessage = validateFile(target);
 		if (null != errorMessage) {
 			throw new IOException(errorMessage);
@@ -83,7 +85,7 @@ public class RandomAccessPagedFile implements PagedFile {
 		}
 		raf.seek(pageNumber * pageData.length);
 		raf.read(pageData);
-		Page page = new RandomAccessPage(pageNumber, pageData, this);
+		Page page = new StandardPage(pageNumber, pageData);
 		return page;
 	}
 
@@ -108,6 +110,21 @@ public class RandomAccessPagedFile implements PagedFile {
 	@Override
 	public int getPageSize() {
 		return pageData.length;
+	}
+
+	@Override
+	public Page allocPage() throws IOException {
+		throw new NotImplementedException("allocPage has not been implemented.");
+	}
+
+	@Override
+	public Page extendPage(Page page) throws IOException {
+		throw new NotImplementedException("extendPage has not been implemented.");
+	}
+
+	@Override
+	public boolean freePage(Page page) throws IOException {
+		return true;
 	}
 
 	/**
