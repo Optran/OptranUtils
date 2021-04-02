@@ -35,7 +35,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import com.github.optran.utils.exceptions.CorruptDataSetException;
-import com.github.optran.utils.pagedfile.PagedRandomAccessFile;
+import com.github.optran.utils.pagedfile.BufferedRandomAccessFile;
 
 public final class DataSetIOBuilder {
 	private static final String TEMP_FILE_PREFIX = "OPTRAN_DATA_SET_";
@@ -81,11 +81,11 @@ public final class DataSetIOBuilder {
 		if(pageSize<=10) {
 			pageSize = 65536;
 		}
-		PagedRandomAccessFile praf = null;
+		BufferedRandomAccessFile praf = null;
 		if(cacheSize>0) {
-			praf = new PagedRandomAccessFile(file, pageSize, cacheSize);
+			praf = new BufferedRandomAccessFile(file, pageSize, cacheSize);
 		} else {
-			praf = new PagedRandomAccessFile(file, pageSize);
+			praf = new BufferedRandomAccessFile(file, pageSize);
 		}
 		return new DataSetIO(new DataSet(praf));
 	}

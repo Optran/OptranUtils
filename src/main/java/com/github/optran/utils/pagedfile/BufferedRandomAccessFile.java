@@ -34,27 +34,27 @@ import java.io.RandomAccessFile;
  * @author Ashutosh Wad
  *
  */
-public class PagedRandomAccessFile {
+public class BufferedRandomAccessFile {
 	private long head;
 	private int pageSize;
 	private PagedFile pagedFile;
 
-	public PagedRandomAccessFile(PagedFile pagedFile) {
+	public BufferedRandomAccessFile(PagedFile pagedFile) {
 		head = 0;
 		this.pagedFile = pagedFile;
 		pageSize = pagedFile.getPageSize();
 	}
 
-	public PagedRandomAccessFile(File target, int pageSize) throws IOException {
+	public BufferedRandomAccessFile(File target, int pageSize) throws IOException {
 		head = 0;
 		this.pageSize = pageSize;
 		pagedFile = new StandardPagedFile(target, pageSize);
 	}
 
-	public PagedRandomAccessFile(File target, int pageSize, int cacheSize) throws IOException {
+	public BufferedRandomAccessFile(File target, int pageSize, int cacheSize) throws IOException {
 		head = 0;
 		this.pageSize = pageSize;
-		pagedFile = new LRUCachePagedFile(new StandardPagedFile(target, pageSize), cacheSize);
+		pagedFile = new CachedPagedFile(new StandardPagedFile(target, pageSize), cacheSize);
 	}
 
 	public long getHead() {

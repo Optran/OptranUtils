@@ -61,32 +61,6 @@ public interface PagedFile {
 	public int getPageSize();
 
 	/**
-	 * This method allocates a page on the disk to be written to later.
-	 * 
-	 * @return The newly allocated page. Null if no page could be allocated.
-	 * @throws IOException If this operation fails.
-	 */
-	public Page allocPage() throws IOException;
-
-	/**
-	 * This method frees the current page. How this freeing is done depends on the
-	 * implementation.
-	 * 
-	 * @return True if the free succeeded, false otherwise.
-	 * @throws IOException If this operation fails.
-	 */
-	public boolean freePage(Page page) throws IOException;
-
-	/**
-	 * This method increases the page size of the current page by one default page
-	 * size.
-	 * 
-	 * @return The newly extended page. Null if the page could not be extended.
-	 * @throws IOException If this operation fails.
-	 */
-	public Page extendPage(Page page) throws IOException;
-
-	/**
 	 * This method flushes any data that has not yet been written to the disk, to
 	 * the disk.
 	 */

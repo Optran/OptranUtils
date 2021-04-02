@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
 import com.github.optran.utils.exceptions.CorruptDataSetException;
 import com.github.optran.utils.exceptions.IncorrectInitializationValueException;
 import com.github.optran.utils.exceptions.RuntimeIOException;
-import com.github.optran.utils.pagedfile.PagedRandomAccessFile;
+import com.github.optran.utils.pagedfile.BufferedRandomAccessFile;
 
 /**
  * The DataSet class allows synchronous access to a file to read and write
@@ -60,14 +60,14 @@ final class DataSet {
 	 */
 	private static final int LAST_REC_LOC_SIZE = 8;
 
-	private PagedRandomAccessFile saveFile;
+	private BufferedRandomAccessFile saveFile;
 	private long numberOfRecords;
 	private long lastRecLoc;
 	private long writeHead;
 	private byte[] intVar;
 	private byte[] longVar;
 
-	protected DataSet(PagedRandomAccessFile saveFile) throws IOException {
+	protected DataSet(BufferedRandomAccessFile saveFile) throws IOException {
 		this.saveFile = saveFile;
 		intVar = new byte[4];
 		longVar = new byte[8];
