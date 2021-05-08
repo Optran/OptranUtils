@@ -231,4 +231,42 @@ public class LRUCacheTest {
 			assertEquals(Integer.toString(i), evictedQueue.remove());
 		}
 	}
+
+	@Test
+	public void testCacheLoader() {
+		cache.setCacheLoader(new CacheLoader<Integer, String>() {
+			@Override
+			public Optional<String> get(Integer key) {
+				if (key == 1) {
+					return Optional.of("Scooby doo");
+				} else if (key == 2) {
+					return Optional.ofNullable(null);
+				} else if (key == 3) {
+					return null;
+				} else if (key == 4) {
+					return Optional.of("Should not be cached");
+				}
+				return null;
+			}
+		});
+		// First check that cache does not contain the keys we want
+		assertFalse(cache.contains(1));
+		assertFalse(cache.contains(2));
+		// Cache get should load data from loader
+		assertEquals("Scooby doo", cache.get(1).get());
+		assertFalse(cache.get(2).isPresent());
+		// The following value returns null from the loader so it should not be present
+		// i.e. it should return null.
+		assertNull(cache.get(3));
+		// Cache should now contain both keys
+		assertTrue(cache.contains(1));
+		assertTrue(cache.contains(2));
+		// The following value returns null from the loader so it should not be cached
+		// at all.
+		assertFalse(cache.contains(3));
+		// Remove the cache loader
+		cache.removeCacheLoader();
+		// The following verifies that the loader is no longer in use
+		assertNull(cache.get(4));
+	}
 }

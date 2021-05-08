@@ -140,4 +140,19 @@ public class StandardPagedFile implements PagedFile {
 			return false;
 		}
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long length() {
+		long length = -1;
+		try {
+			initRaf();
+			length = raf.length();
+		} catch (IOException e) {
+			logger.error("Unable to retrieve length. ", e);
+		}
+		return length;
+	}
 }

@@ -30,6 +30,8 @@ package com.github.optran.utils;
  *
  */
 public final class StringUtils {
+	private static final char[] HEX = "0123456789ABCDEF".toCharArray();
+
 	/**
 	 * This is a null guarded trim. If the input string is null, null is returned
 	 * else the result of the inbuilt trim function is returned.
@@ -78,5 +80,21 @@ public final class StringUtils {
 	 */
 	public static final boolean isNotBlank(String str) {
 		return length(trim(str)) > 0;
+	}
+
+	public static final String byteArrToHex(byte[] data) {
+		if (null == data) {
+			return null;
+		}
+		if (0 == data.length) {
+			return "";
+		}
+		char[] hexChars = new char[data.length * 2];
+		for (int j = 0; j < data.length; j++) {
+			int v = data[j] & 0xFF;
+			hexChars[j * 2] = HEX[v >>> 4];
+			hexChars[j * 2 + 1] = HEX[v & 0x0F];
+		}
+		return new String(hexChars);
 	}
 }

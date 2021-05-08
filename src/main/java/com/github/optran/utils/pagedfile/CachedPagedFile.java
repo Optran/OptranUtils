@@ -96,12 +96,22 @@ public class CachedPagedFile implements PagedFile {
 	}
 
 	@Override
+	public long length() {
+		return pagedFile.length();
+	}
+
+	@Override
 	public boolean exists() {
 		return pagedFile.exists();
 	}
 
 	@Override
 	public boolean close() {
+		try {
+			flush();
+		} catch (IOException e) {
+			throw new RuntimeIOException(e);
+		}
 		return pagedFile.close();
 	}
 }

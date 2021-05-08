@@ -21,46 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
 */
-package com.github.optran.utils.pagedfile;
+package com.github.optran.utils.disk.exception;
 
-import java.io.IOException;
-
-public class ManagedPagedFile {
-	private PagedFile pagedFile;
-
-	public ManagedPagedFile(PagedFile pagedFile) {
-		this.pagedFile = pagedFile;
+public class CorruptDiskException extends RuntimeException {
+	private static final long serialVersionUID = -1733705954208758260L;
+	public CorruptDiskException() {
 	}
-
-	/**
-	 * This method allocates a page on the disk to be written to later.
-	 * 
-	 * @return The newly allocated page. Null if no page could be allocated.
-	 * @throws IOException If this operation fails.
-	 */
-	public Page allocPage() {
-		return null;
+	public CorruptDiskException(Throwable cause) {
+		super(cause);
 	}
-
-	/**
-	 * This method frees the current page. How this freeing is done depends on the
-	 * implementation.
-	 * 
-	 * @return True if the free succeeded, false otherwise.
-	 * @throws IOException If this operation fails.
-	 */
-	public boolean freePage(Page page) {
-		return false;
+	public CorruptDiskException(String message) {
+		super(message);
 	}
-
-	/**
-	 * This method increases the page size of the current page by one default page
-	 * size.
-	 * 
-	 * @return The newly extended page. Null if the page could not be extended.
-	 * @throws IOException If this operation fails.
-	 */
-	public Page extendPage(Page page) {
-		return null;
+	public CorruptDiskException(String message, Throwable cause) {
+		super(message, cause);
 	}
 }

@@ -21,46 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
 */
-package com.github.optran.utils.pagedfile;
+package com.github.optran.utils.cache;
 
-import java.io.IOException;
+import java.util.Optional;
 
-public class ManagedPagedFile {
-	private PagedFile pagedFile;
-
-	public ManagedPagedFile(PagedFile pagedFile) {
-		this.pagedFile = pagedFile;
-	}
-
+/**
+ * This interface is used to provide a default loader that the LRUCache can use
+ * to fetch the value corresponding to a particular key.
+ * 
+ * @author Ashutosh Wad
+ *
+ * @param <Key>
+ * @param <Value>
+ */
+public interface CacheLoader<Key, Value> {
 	/**
-	 * This method allocates a page on the disk to be written to later.
 	 * 
-	 * @return The newly allocated page. Null if no page could be allocated.
-	 * @throws IOException If this operation fails.
+	 * @param key The key whose value needs to be retrieved. If this method returns
+	 *            null then the value is not cached.
+	 * @return The optional containing the associated value if any.
 	 */
-	public Page allocPage() {
-		return null;
-	}
-
-	/**
-	 * This method frees the current page. How this freeing is done depends on the
-	 * implementation.
-	 * 
-	 * @return True if the free succeeded, false otherwise.
-	 * @throws IOException If this operation fails.
-	 */
-	public boolean freePage(Page page) {
-		return false;
-	}
-
-	/**
-	 * This method increases the page size of the current page by one default page
-	 * size.
-	 * 
-	 * @return The newly extended page. Null if the page could not be extended.
-	 * @throws IOException If this operation fails.
-	 */
-	public Page extendPage(Page page) {
-		return null;
-	}
+	public Optional<Value> get(Key key);
 }

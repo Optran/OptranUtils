@@ -1,0 +1,33 @@
+
+100 byte header
+
+Header structure
+		11 bytes -> OptranDisk\n
+		4 bytes -> PageSize (max around 4 gb)
+		8 bytes -> start of freelist file.
+		8 bytes -> last allocated page
+		38 bytes -> reserved initialized to 0
+
+Page structure (page 0 starts at 101 to page length all other pages start at pageNum*pageSize to pageSize)
+		1 byte = Allocate or unallocated. 
+					0 is unallocated, 1-255 are reserved for file types.
+					1 is a file
+					2 is a directory
+		8 bytes = pointer to the next page of the file
+		4 bytes = used length in this block/page.
+Total metadata per page = 13 bytes.
+
+Free page structure
+	A free page follows the same structure as a normal page however it contains an additional 8 byte field as a back pointer to the previous free page.
+	This is done to allow easier implementation of realloc
+
+Root file always starts at block 0, cannot be deleted, and is a directory.
+
+Directory files contain file entries
+	Entry = File type or Dir Type (1 byte)|File length(8 bytes)|name length (4bytes)|Name(length specified by previous var)
+	Can ofcourse spill to next blocks. no restrictions on that. This puts a limit on the number of files you should put in a directory as a single directory is loaded into memory at once.
+
+Actual files may be named i.e. have a directory or unnamed where they are managed by the user and do not have a directory entry.
+	Interaction with the files is done with streams. Random access is allowed.
+	malloc function allocates a new block from either the freelist or the end of file
+	free frees up a block and adds it to the free list
