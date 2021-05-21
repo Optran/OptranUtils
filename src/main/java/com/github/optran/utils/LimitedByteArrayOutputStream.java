@@ -21,19 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
 */
-package com.github.optran.utils.exceptions;
+package com.github.optran.utils;
 
-public class RuntimeIOException extends RuntimeException {
-	private static final long serialVersionUID = 1L;
-	public RuntimeIOException() {
+import java.io.IOException;
+import java.io.OutputStream;
+
+public class LimitedByteArrayOutputStream extends OutputStream {
+	private final byte[] data;
+	private int index;
+
+	public LimitedByteArrayOutputStream(int limit) {
+		data = new byte[limit];
+		index = 0;
 	}
-	public RuntimeIOException(Throwable cause) {
-		super(cause.getMessage(), cause);
+
+	public LimitedByteArrayOutputStream(byte[]data) {
+		this.data = data;
+		index = 0;
 	}
-	public RuntimeIOException(String message) {
-		super(message);
+
+	@Override
+	public void write(int b) throws IOException {
+		if (index >= data.length) {
+			throw new IOException("Memory usage exeeded. Max limit was " + data.length);
+		}
 	}
-	public RuntimeIOException(String message, Throwable cause) {
-		super(message, cause);
+
+	public byte[] toByteArray() {
+		return data;
 	}
 }

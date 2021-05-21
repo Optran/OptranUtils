@@ -21,19 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
 */
-package com.github.optran.utils.exceptions;
+package com.github.optran.utils.disk.heap;
 
-public class RuntimeIOException extends RuntimeException {
-	private static final long serialVersionUID = 1L;
-	public RuntimeIOException() {
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
+public class MemoryReference {
+	private long reference;
+	private byte[] data;
+	public long getReference() {
+		return reference;
 	}
-	public RuntimeIOException(Throwable cause) {
-		super(cause.getMessage(), cause);
+	public void setReference(long reference) {
+		this.reference = reference;
 	}
-	public RuntimeIOException(String message) {
-		super(message);
+	public byte[] getData() {
+		return data;
 	}
-	public RuntimeIOException(String message, Throwable cause) {
-		super(message, cause);
+	public void setData(byte[] data) {
+		this.data = data;
 	}
 }

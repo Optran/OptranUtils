@@ -30,6 +30,8 @@ import java.io.RandomAccessFile;
 
 import org.apache.log4j.Logger;
 
+import com.github.optran.utils.exceptions.RuntimeIOException;
+
 public class StandardPagedFile implements PagedFile {
 	private static final Logger logger = Logger.getLogger(StandardPagedFile.class);
 	private File target;
@@ -112,11 +114,14 @@ public class StandardPagedFile implements PagedFile {
 
 	/**
 	 * {@inheritDoc}
-	 * 
-	 * As this class directly updates the file on the disk this method does nothing.
 	 */
 	@Override
 	public void flush() {
+		try {
+			raf.getFD().sync();
+		} catch (IOException e) {
+			throw new RuntimeIOException(e);
+		}
 	}
 
 	/**
