@@ -116,4 +116,8 @@ public class BufferedRandomAccessFile {
 	public void close() {
 		pagedFile.close();
 	}
+
+	public long length() {
+		return pagedFile.length();
+	}
 }

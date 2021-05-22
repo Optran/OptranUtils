@@ -81,4 +81,14 @@ public interface PagedFile {
 	 * @return True if the close was successful, false otherwise.
 	 */
 	public boolean close();
+
+	/**
+	 * Returns the current size in bytes of the file on the disk at the time of
+	 * invocation.
+	 * 
+	 * @return The current size in bytes of the file on the disk at the time of
+	 *         invocation. In the event length was not retrieved correctly -1 is
+	 *         returned.
+	 */
+	public long length();
 }

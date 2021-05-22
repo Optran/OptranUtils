@@ -47,6 +47,7 @@ public class LRUCache<Key, Value> {
 	private final AtomicLong order;
 	private final int capacity;
 	private final Map<Key, LRUCacheEntry<Key, Value>> cacheMap;
+	private CacheLoader<Key, Value>cacheLoader;
 	private final TreeMap<Long, LRUCacheEntry<Key, Value>> cacheEvictionMap;
 	private final List<CacheEvictionListener<Key, Value>> evictionListenerList;
 
@@ -75,6 +76,14 @@ public class LRUCache<Key, Value> {
 		cacheMap = new HashMap<>();
 		cacheEvictionMap = new TreeMap<>();
 		evictionListenerList = new LinkedList<>();
+	}
+
+	public void setCacheLoader(CacheLoader<Key, Value>cacheLoader) {
+		this.cacheLoader = cacheLoader;
+	}
+	
+	public void removeCacheLoader() {
+		this.cacheLoader = null;
 	}
 
 	/**
@@ -146,10 +155,22 @@ public class LRUCache<Key, Value> {
 	 *         guard against the possibility that the value that was saved was null.
 	 */
 	public Optional<Value> get(Key key) {
-		if (!cacheMap.containsKey(key)) {
+		if (cacheMap.containsKey(key)) {
+			return Optional.ofNullable(cacheMap.get(key).getValue());
+		}
+		if(null==cacheLoader) {
 			return null;
 		}
-		return Optional.ofNullable(cacheMap.get(key).getValue());
+		Optional<Value>optional = cacheLoader.get(key);
+		if(null==optional) {
+			return null;
+		}
+		Value value = null;
+		if(optional.isPresent()) {
+			value = optional.get();
+		}
+		put(key, value);
+		return Optional.ofNullable(value);
 	}
 
 	/**
