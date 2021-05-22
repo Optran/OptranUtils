@@ -103,6 +103,9 @@ public class DiskHeap implements Heap {
 		braf.write(allocHeader.toBytes());
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public long malloc(int size) {
 		long reference = UNALLOCATED;
@@ -161,11 +164,45 @@ public class DiskHeap implements Heap {
 		return reference;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public long realloc(long reference, int size) {
+		if(size==0) {
+			return UNALLOCATED;
+		}
+		int oldSize = sizeOf(reference);
+		int oldFreeListIndex = header.calculateFreeListIndex(oldSize);
+		int oldBlockSize = header.calculateFreeListBlockSize(oldFreeListIndex);
+		
+		int newFreeListIndex = header.calculateFreeListIndex(size);
+		int newBlockSize = header.calculateFreeListBlockSize(newFreeListIndex);
+		
+		if(oldSize==size) {
+			return reference;
+		} else if(oldBlockSize==newBlockSize) {
+			AllocHeader header = readHeader(reference-4);
+			header.setSize(newBlockSize);
+			writeHeader(reference-4, header);
+			return reference;
+		} else {
+			byte[]data = read(reference);
+			free(reference);
+			reference = malloc(size);
+			byte[]newData = read(reference);
+			int limit = newData.length>data.length?newData.length:data.length;
+			for (int i = 0; i < limit; i++) {
+				newData[i] = data[i];
+			}
+			write(reference, newData);
+		}
 		return 0;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void free(long reference) {
 		AllocHeader allocHeader = readHeader(reference-4);
@@ -194,6 +231,9 @@ public class DiskHeap implements Heap {
 		braf.write(freedBlock.toBytes());
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int sizeOf(long reference) {
 		int size = readHeader(reference-4).getSize();
@@ -203,6 +243,9 @@ public class DiskHeap implements Heap {
 		return size;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public byte[] read(long reference) {
 		byte[]data = new byte[sizeOf(reference)];
@@ -211,8 +254,11 @@ public class DiskHeap implements Heap {
 		return data;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public void save(long reference, byte[] data) {
+	public void write(long reference, byte[] data) {
 		int size = sizeOf(reference);
 		if(data.length>size) {
 			throw new NotEnoughMemoryException("Provided data is larger than the space allocated for this pointer.");
@@ -232,36 +278,36 @@ public class DiskHeap implements Heap {
 		braf.close();
 	}
 
-	public static OptranHeapBuilder builder() {
-		return new OptranHeapBuilder();
+	public static DiskHeapBuilder builder() {
+		return new DiskHeapBuilder();
 	}
 
-	public static class OptranHeapBuilder {
+	public static class DiskHeapBuilder {
 		private int pageSize;
 		private int cacheSize;
 		private File targetFile;
 
-		public OptranHeapBuilder() {
+		public DiskHeapBuilder() {
 			pageSize = 512;
 			cacheSize = 32;
 			targetFile = null;
 		}
 
-		public OptranHeapBuilder pageSize(int pageSize) {
+		public DiskHeapBuilder pageSize(int pageSize) {
 			if (pageSize > 512) {
 				this.pageSize = pageSize;
 			}
 			return this;
 		}
 
-		public OptranHeapBuilder cacheSize(int cacheSize) {
+		public DiskHeapBuilder cacheSize(int cacheSize) {
 			if (cacheSize > 0) {
 				this.cacheSize = cacheSize;
 			}
 			return this;
 		}
 
-		public OptranHeapBuilder targetFile(File targetFile) {
+		public DiskHeapBuilder targetFile(File targetFile) {
 			this.targetFile = targetFile;
 			return this;
 		}
