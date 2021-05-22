@@ -23,7 +23,7 @@
 */
 package com.github.optran.utils.pagedfile;
 
-import java.io.IOException;
+import com.github.optran.utils.exceptions.RuntimeIOException;
 
 /**
  * The PagedFile class allows random access to any binary file in a paged
@@ -38,19 +38,19 @@ public interface PagedFile {
 	 * 
 	 * @param pageNumber The index of the {@link Page} to be fetched.
 	 * @return The {@link Page} at the specified index.
-	 * @throws IOException If an IO exception is thrown when interacting with the
+	 * @throws RuntimeIOException If an IO exception is thrown when interacting with the
 	 *                     file layer.
 	 */
-	public Page readPage(long pageNumber) throws IOException;
+	public Page readPage(long pageNumber);
 
 	/**
 	 * Writes the {@link Page} that has been provided.
 	 * 
 	 * @param page The {@link Page} to be written.
-	 * @throws IOException If an IO exception is thrown when interacting with the
+	 * @throws RuntimeIOException If an IO exception is thrown when interacting with the
 	 *                     file layer.
 	 */
-	public void writePage(Page page) throws IOException;
+	public void writePage(Page page);
 
 	/**
 	 * This function returns the size of any single page that is/can be read from
@@ -64,7 +64,7 @@ public interface PagedFile {
 	 * This method flushes any data that has not yet been written to the disk, to
 	 * the disk.
 	 */
-	public void flush() throws IOException;
+	public void flush();
 
 	/**
 	 * This method checks if the underlying {@link PagedFile} actually exists.

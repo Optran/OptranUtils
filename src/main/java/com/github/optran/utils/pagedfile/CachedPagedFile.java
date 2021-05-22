@@ -23,13 +23,14 @@
 */
 package com.github.optran.utils.pagedfile;
 
-import java.io.IOException;
+import java.util.Optional;
 
 import org.apache.log4j.Logger;
 
-import com.github.optran.utils.cache.LRUCache;
 import com.github.optran.utils.cache.CacheAction;
 import com.github.optran.utils.cache.CacheEvictionListener;
+import com.github.optran.utils.cache.CacheLoader;
+import com.github.optran.utils.cache.LRUCache;
 import com.github.optran.utils.exceptions.RuntimeIOException;
 
 public class CachedPagedFile implements PagedFile {
@@ -46,26 +47,31 @@ public class CachedPagedFile implements PagedFile {
 				writePageToDisk(page);
 			}
 		});
+		cache.setCacheLoader(new CacheLoader<Long, Page>() {
+			@Override
+			public Optional<Page> get(Long pageNumber) {
+				Page page = pagedFile.readPage(pageNumber);
+				return Optional.ofNullable(page);
+			}
+		});
 	}
 
 	@Override
-	public Page readPage(long pageNumber) throws IOException {
-		Page page = null;
-		if (cache.contains(pageNumber)) {
-			page = cache.get(pageNumber).get();
-		} else {
-			page = pagedFile.readPage(pageNumber);
-			cache.put(page.getPageId(), page);
-		}
-		return page;
+	public Page readPage(long pageNumber) {
+		return cache.get(pageNumber).get();
 	}
 
 	@Override
-	public void writePage(Page page) throws IOException {
+	public void writePage(Page page) {
 		if (null == page) {
 			return;
 		}
 		cache.put(page.getPageId(), page);
+	}
+
+	@Override
+	public int getPageSize() {
+		return pagedFile.getPageSize();
 	}
 
 	private void writePageToDisk(Page page) {
@@ -80,12 +86,7 @@ public class CachedPagedFile implements PagedFile {
 	}
 
 	@Override
-	public int getPageSize() {
-		return pagedFile.getPageSize();
-	}
-
-	@Override
-	public void flush() throws IOException {
+	public void flush() {
 		cache.perform(new CacheAction<Long, Page>() {
 			@Override
 			public void perform(Long pageNumber, Page page) {
@@ -107,11 +108,7 @@ public class CachedPagedFile implements PagedFile {
 
 	@Override
 	public boolean close() {
-		try {
-			flush();
-		} catch (IOException e) {
-			throw new RuntimeIOException(e);
-		}
+		flush();
 		return pagedFile.close();
 	}
 }

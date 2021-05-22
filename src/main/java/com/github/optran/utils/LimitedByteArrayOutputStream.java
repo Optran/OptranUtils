@@ -40,11 +40,16 @@ public class LimitedByteArrayOutputStream extends OutputStream {
 		index = 0;
 	}
 
+	public void skip(int value) {
+		index = index + value;
+	}
+
 	@Override
 	public void write(int b) throws IOException {
 		if (index >= data.length) {
 			throw new IOException("Memory usage exeeded. Max limit was " + data.length);
 		}
+		data[index++] = (byte)(b&0xFF);
 	}
 
 	public byte[] toByteArray() {

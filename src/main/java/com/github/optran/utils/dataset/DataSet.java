@@ -183,36 +183,32 @@ final class DataSet {
 	 * @param record The record to be written.
 	 */
 	public synchronized void write(byte[] record) {
-		try {
-			// Set the length and record variables.
-			int len = -1;
-			boolean isNull = false;
-			if (null == record) {
-				len = 0;
-				isNull = true;
-			} else {
-				len = record.length;
-			}
-			logger.trace("Write head at: " + writeHead);
-			logger.trace("Record length is: " + len);
-			if (0 == len) {
-				record = new byte[1];
-				record[0] = isNull ? (byte) 0 : (byte) 1;
-				logger.trace("Null indicator: " + record[0]);
-			}
-			// Calculate prevRec and write data
-			int prevRec = (lastRecLoc > 0) ? (int) (writeHead - lastRecLoc) : 0;
-			logger.trace("Previous record offset: " + prevRec);
-			byte[] data = new DataSetRecord(prevRec, len, record).serialize();
-			saveFile.setHead(writeHead);
-			logger.trace("Set head to: " + writeHead);
-			saveFile.write(data);
-			lastRecLoc = writeHead;
-			writeHead = writeHead + data.length;
-			numberOfRecords++;
-		} catch (IOException e) {
-			throw new RuntimeIOException(e);
+		// Set the length and record variables.
+		int len = -1;
+		boolean isNull = false;
+		if (null == record) {
+			len = 0;
+			isNull = true;
+		} else {
+			len = record.length;
 		}
+		logger.trace("Write head at: " + writeHead);
+		logger.trace("Record length is: " + len);
+		if (0 == len) {
+			record = new byte[1];
+			record[0] = isNull ? (byte) 0 : (byte) 1;
+			logger.trace("Null indicator: " + record[0]);
+		}
+		// Calculate prevRec and write data
+		int prevRec = (lastRecLoc > 0) ? (int) (writeHead - lastRecLoc) : 0;
+		logger.trace("Previous record offset: " + prevRec);
+		byte[] data = new DataSetRecord(prevRec, len, record).serialize();
+		saveFile.setHead(writeHead);
+		logger.trace("Set head to: " + writeHead);
+		saveFile.write(data);
+		lastRecLoc = writeHead;
+		writeHead = writeHead + data.length;
+		numberOfRecords++;
 	}
 
 	/**
@@ -223,23 +219,19 @@ final class DataSet {
 	 * @return
 	 */
 	public synchronized void commit() {
-		try {
-			if (0 == numberOfRecords) {
-				saveFile.close();
-				return;
-			}
-			saveFile.flush();
-			logger.trace("Flushing cached data");
-			saveFile.setHead(HEADER_SIZE);
-			saveFile.write(longToByteArr(numberOfRecords));
-			saveFile.write(longToByteArr(lastRecLoc));
-			logger.trace("Commiting records...");
-			logger.trace("numberOfRecords: " + numberOfRecords);
-			logger.trace("lastRecLoc: " + lastRecLoc);
+		if (0 == numberOfRecords) {
 			saveFile.close();
-			logger.trace("File closed successfully");
-		} catch (IOException e) {
-			throw new RuntimeIOException(e);
+			return;
 		}
+		saveFile.flush();
+		logger.trace("Flushing cached data");
+		saveFile.setHead(HEADER_SIZE);
+		saveFile.write(longToByteArr(numberOfRecords));
+		saveFile.write(longToByteArr(lastRecLoc));
+		logger.trace("Commiting records...");
+		logger.trace("numberOfRecords: " + numberOfRecords);
+		logger.trace("lastRecLoc: " + lastRecLoc);
+		saveFile.close();
+		logger.trace("File closed successfully");
 	}
 }

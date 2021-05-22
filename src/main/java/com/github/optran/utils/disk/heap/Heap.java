@@ -23,23 +23,23 @@
 */
 package com.github.optran.utils.disk.heap;
 
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+public interface Heap {
+	/**
+	 * Allocate memory on disk that can store data of length size.
+	 * 
+	 * @param size length in bytes of the memory to be allocated.
+	 * @return Reference to the allocated memory, or 0 if memory could not be
+	 *         allocated.
+	 */
+	public long malloc(int size);
 
-public class MemoryReference {
-	private long reference;
-	private byte[] data;
-	public long getReference() {
-		return reference;
-	}
-	public void setReference(long reference) {
-		this.reference = reference;
-	}
-	public byte[] getData() {
-		return data;
-	}
-	public void setData(byte[] data) {
-		this.data = data;
-	}
+	public long realloc(long reference, int size);
+
+	public void free(long reference);
+
+	public int sizeOf(long reference);
+
+	public byte[] read(long reference);
+
+	public void save(long reference, byte[] data);
 }

@@ -27,6 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import com.github.optran.utils.exceptions.RuntimeIOException;
+
 /**
  * This class allows the use of the {@link PagedFile} just like the
  * {@link RandomAccessFile} class with better efficiency due to page caching.
@@ -45,13 +47,13 @@ public class BufferedRandomAccessFile {
 		pageSize = pagedFile.getPageSize();
 	}
 
-	public BufferedRandomAccessFile(File target, int pageSize) throws IOException {
+	public BufferedRandomAccessFile(File target, int pageSize) {
 		head = 0;
 		this.pageSize = pageSize;
 		pagedFile = new StandardPagedFile(target, pageSize);
 	}
 
-	public BufferedRandomAccessFile(File target, int pageSize, int cacheSize) throws IOException {
+	public BufferedRandomAccessFile(File target, int pageSize, int cacheSize) {
 		head = 0;
 		this.pageSize = pageSize;
 		pagedFile = new CachedPagedFile(new StandardPagedFile(target, pageSize), cacheSize);
@@ -65,7 +67,7 @@ public class BufferedRandomAccessFile {
 		this.head = head;
 	}
 
-	public int read() throws IOException {
+	public int read() {
 		Page page = pagedFile.readPage(head / pageSize);
 		page.setHead((int) (head % pageSize));
 		int retVal = page.read();
@@ -73,7 +75,7 @@ public class BufferedRandomAccessFile {
 		return retVal;
 	}
 
-	public int read(byte[] data) throws IOException {
+	public int read(byte[] data) {
 		int bytesRead = 0;
 		if (null == data) {
 			return bytesRead;
@@ -85,7 +87,7 @@ public class BufferedRandomAccessFile {
 		return bytesRead;
 	}
 
-	public void write(int value) throws IOException {
+	public void write(int value) {
 		Page page = pagedFile.readPage(head / pageSize);
 		page.setHead((int) (head % pageSize));
 		page.write(value);
@@ -93,7 +95,7 @@ public class BufferedRandomAccessFile {
 		pagedFile.writePage(page);
 	}
 
-	public int write(byte[] data) throws IOException {
+	public int write(byte[] data) {
 		int bytesWritten = 0;
 		if (null == data) {
 			return bytesWritten;
@@ -109,7 +111,7 @@ public class BufferedRandomAccessFile {
 		return pagedFile.exists();
 	}
 
-	public void flush() throws IOException {
+	public void flush() {
 		pagedFile.flush();
 	}
 

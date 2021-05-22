@@ -26,9 +26,8 @@ package com.github.optran.utils.disk.heap;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
+import com.github.optran.utils.PrimitiveSerializationUtils;
 import com.github.optran.utils.exceptions.CorruptHeapException;
 import com.github.optran.utils.exceptions.RuntimeIOException;
 
@@ -46,7 +45,8 @@ import com.github.optran.utils.exceptions.RuntimeIOException;
  * @author Ashutosh Wad
  *
  */
-public class OptranHeapHeader {
+public class DiskHeapHeader {
+	public static final int HEADER_LENGTH = 256;
 	private static final String FILE_HEADER = "OptranHeap\n";
 	private final byte[] header;
 	private final long[] freeList;
@@ -55,16 +55,16 @@ public class OptranHeapHeader {
 			65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728,
 			268435456 };
 
-	public OptranHeapHeader() {
-		header = new byte[100];
+	public DiskHeapHeader() {
+		header = new byte[HEADER_LENGTH];
 		freeList = new long[24];
 		saveHeader();
-		nextAlloc = 100;
+		nextAlloc = HEADER_LENGTH;
 	}
 
-	public OptranHeapHeader(byte[] header, long nextAlloc) throws IOException {
+	public DiskHeapHeader(byte[] header, long nextAlloc) throws IOException {
 		this.header = header;
-		if (100 != header.length) {
+		if (HEADER_LENGTH != header.length) {
 			throw new CorruptHeapException("Header too short.");
 		}
 		byte[] headerString = new byte[FILE_HEADER.length()];
@@ -82,7 +82,7 @@ public class OptranHeapHeader {
 
 	public byte[] getHeader() {
 		saveHeader();
-		byte[] retVal = new byte[100];
+		byte[] retVal = new byte[HEADER_LENGTH];
 		for (int i = 0; i < retVal.length; i++) {
 			retVal[i] = header[i];
 		}
@@ -147,61 +147,61 @@ public class OptranHeapHeader {
 
 	/**
 	 * This method calculates the index of the freelist that could contain a free
-	 * block large enough to accomodate the memory requested.
+	 * block large enough to accommodate the memory requested.
 	 * 
 	 * @param size The amount of memory requested.
 	 * @return The index of the freelist that could contain a free block large
-	 *         enough to accomodate the memory requested.
+	 *         enough to accommodate the memory requested.
 	 */
 	public int calculateFreeListIndex(int size) {
 		int retVal = -1;
-		if (size > 0 && size <= 28) {
+		if (size > 0 && size <= 24) {
 			retVal = 0;
-		} else if (size > 28 && size <= 60) {
+		} else if (size > 24 && size <= 56) {
 			retVal = 1;
-		} else if (size > 60 && size <= 124) {
+		} else if (size > 56 && size <= 120) {
 			retVal = 2;
-		} else if (size > 124 && size <= 252) {
+		} else if (size > 120 && size <= 248) {
 			retVal = 3;
-		} else if (size > 252 && size <= 508) {
+		} else if (size > 248 && size <= 504) {
 			retVal = 4;
-		} else if (size > 508 && size <= 1020) {
+		} else if (size > 504 && size <= 1016) {
 			retVal = 5;
-		} else if (size > 1020 && size <= 2044) {
+		} else if (size > 1016 && size <= 2040) {
 			retVal = 6;
-		} else if (size > 2044 && size <= 4092) {
+		} else if (size > 2040 && size <= 4088) {
 			retVal = 7;
-		} else if (size > 4092 && size <= 8188) {
+		} else if (size > 4088 && size <= 8184) {
 			retVal = 8;
-		} else if (size > 8188 && size <= 16380) {
+		} else if (size > 8184 && size <= 16376) {
 			retVal = 9;
-		} else if (size > 16380 && size <= 32764) {
+		} else if (size > 16376 && size <= 32760) {
 			retVal = 10;
-		} else if (size > 32764 && size <= 65532) {
+		} else if (size > 32760 && size <= 65528) {
 			retVal = 11;
-		} else if (size > 65532 && size <= 131068) {
+		} else if (size > 65528 && size <= 131064) {
 			retVal = 12;
-		} else if (size > 131068 && size <= 262140) {
+		} else if (size > 131064 && size <= 262136) {
 			retVal = 13;
-		} else if (size > 262140 && size <= 524284) {
+		} else if (size > 262136 && size <= 524280) {
 			retVal = 14;
-		} else if (size > 524284 && size <= 1048572) {
+		} else if (size > 524280 && size <= 1048568) {
 			retVal = 15;
-		} else if (size > 1048572 && size <= 2097148) {
+		} else if (size > 1048568 && size <= 2097144) {
 			retVal = 16;
-		} else if (size > 2097148 && size <= 4194300) {
+		} else if (size > 2097144 && size <= 4194296) {
 			retVal = 17;
-		} else if (size > 4194300 && size <= 8388604) {
+		} else if (size > 4194296 && size <= 8388600) {
 			retVal = 18;
-		} else if (size > 8388604 && size <= 16777212) {
+		} else if (size > 8388600 && size <= 16777208) {
 			retVal = 19;
-		} else if (size > 16777212 && size <= 33554428) {
+		} else if (size > 16777208 && size <= 33554424) {
 			retVal = 20;
-		} else if (size > 33554428 && size <= 67108860) {
+		} else if (size > 33554424 && size <= 67108856) {
 			retVal = 21;
-		} else if (size > 67108860 && size <= 134217724) {
+		} else if (size > 67108856 && size <= 134217720) {
 			retVal = 22;
-		} else if (size > 134217724 && size <= 268435452) {
+		} else if (size > 134217720 && size <= 268435448) {
 			retVal = 23;
 		}
 		return retVal;
@@ -213,11 +213,13 @@ public class OptranHeapHeader {
 	private void loadHeader() {
 		try {
 			ByteArrayInputStream bais = new ByteArrayInputStream(header);
-			ObjectInputStream ois = new ObjectInputStream(bais);
+			bais.skip(FILE_HEADER.length());
+			byte[]data = new byte[8];
 			for (int i = 0; i < freeList.length; i++) {
-				freeList[i] = ois.readLong();
+				bais.read(data);
+				freeList[i] = PrimitiveSerializationUtils.byteArrToLong(data);
 			}
-			ois.close();
+			bais.close();
 		} catch (IOException e) {
 			throw new RuntimeIOException(e);
 		}
@@ -229,12 +231,11 @@ public class OptranHeapHeader {
 	private void saveHeader() {
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			ObjectOutputStream oos = new ObjectOutputStream(baos);
 			baos.write(FILE_HEADER.getBytes());
 			for (int i = 0; i < freeList.length; i++) {
-				oos.writeLong(freeList[i]);
+				baos.write(PrimitiveSerializationUtils.longToByteArr(freeList[i]));
 			}
-			oos.close();
+			baos.close();
 			byte[] data = baos.toByteArray();
 			for (int i = 0; i < data.length; i++) {
 				header[i] = data[i];

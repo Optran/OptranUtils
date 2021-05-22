@@ -38,17 +38,21 @@ public class StandardPagedFile implements PagedFile {
 	private RandomAccessFile raf;
 	private byte[] pageData;
 
-	public StandardPagedFile(File target, int pageSize) throws IOException {
-		String errorMessage = validateFile(target);
-		if (null != errorMessage) {
-			throw new IOException(errorMessage);
+	public StandardPagedFile(File target, int pageSize) {
+		try {
+			String errorMessage = validateFile(target);
+			if (null != errorMessage) {
+				throw new RuntimeIOException(errorMessage);
+			}
+			if (0 >= pageSize) {
+				throw new RuntimeIOException("The page size provided is too small. pageSize = " + pageSize);
+			}
+			pageData = new byte[pageSize];
+			this.target = target;
+			raf = new RandomAccessFile(target, "rw");
+		} catch (IOException e) {
+			throw new RuntimeIOException(e);
 		}
-		if (0 >= pageSize) {
-			throw new IOException("The page size provided is too small. pageSize = " + pageSize);
-		}
-		pageData = new byte[pageSize];
-		this.target = target;
-		raf = new RandomAccessFile(target, "rw");
 	}
 
 	public static String validateFile(File target) {
@@ -64,11 +68,15 @@ public class StandardPagedFile implements PagedFile {
 		return null;
 	}
 
-	private void initRaf() throws FileNotFoundException {
-		if (null != raf) {
-			return;
+	private void initRaf() {
+		try {
+			if (null != raf) {
+				return;
+			}
+			raf = new RandomAccessFile(target, "rw");
+		} catch (IOException e) {
+			throw new RuntimeIOException(e);
 		}
-		raf = new RandomAccessFile(target, "rw");
 	}
 
 	/**
@@ -78,15 +86,19 @@ public class StandardPagedFile implements PagedFile {
 	 *                     file layer.
 	 */
 	@Override
-	public Page readPage(long pageNumber) throws IOException {
-		initRaf();
-		for (int i = 0; i < pageData.length; i++) {
-			pageData[i] = 0;
+	public Page readPage(long pageNumber) {
+		try {
+			initRaf();
+			for (int i = 0; i < pageData.length; i++) {
+				pageData[i] = 0;
+			}
+			raf.seek(pageNumber * pageData.length);
+			raf.read(pageData);
+			Page page = new StandardPage(pageNumber, pageData);
+			return page;
+		} catch (IOException e) {
+			throw new RuntimeIOException(e);
 		}
-		raf.seek(pageNumber * pageData.length);
-		raf.read(pageData);
-		Page page = new StandardPage(pageNumber, pageData);
-		return page;
 	}
 
 	/**
@@ -96,12 +108,16 @@ public class StandardPagedFile implements PagedFile {
 	 *                     file layer.
 	 */
 	@Override
-	public void writePage(Page page) throws IOException {
-		initRaf();
-		raf.seek(page.getPageId() * pageData.length);
-		raf.write(page.getData());
-		page.clean();
-		logger.trace("Wrote page (" + page.getPageId() + ") to disk.");
+	public void writePage(Page page) {
+		try {
+			initRaf();
+			raf.seek(page.getPageId() * pageData.length);
+			raf.write(page.getData());
+			page.clean();
+			logger.trace("Wrote page (" + page.getPageId() + ") to disk.");
+		} catch (IOException e) {
+			throw new RuntimeIOException(e);
+		}
 	}
 
 	/**
