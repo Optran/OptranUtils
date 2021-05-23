@@ -7,6 +7,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import com.github.optran.utils.disk.heap.DiskHeap;
@@ -26,11 +27,11 @@ public class BigQueue {
 		this.heap = heap;
 	}
 
-	protected long getHeader() {
+	public long getHeader() {
 		return header;
 	}
 
-	protected void setHeader(long header) {
+	public void setHeader(long header) {
 		this.header = header;
 	}
 
@@ -69,6 +70,28 @@ public class BigQueue {
 		heap.write(reference, data);
 	}
 
+	public void pushStr(String str) {
+		push(str.getBytes(StandardCharsets.UTF_16));
+	}
+
+	public Optional<String> peekStr() {
+		Optional<byte[]> retVal = peek();
+		if(null==retVal || !retVal.isPresent()) {
+			return null;
+		} else {
+			return Optional.ofNullable(new String(retVal.get(), StandardCharsets.UTF_16));
+		}
+	}
+
+	public Optional<String> popStr() {
+		Optional<byte[]> retVal = pop();
+		if(null==retVal || !retVal.isPresent()) {
+			return null;
+		} else {
+			return Optional.ofNullable(new String(retVal.get(), StandardCharsets.UTF_16));
+		}
+	}
+
 	public void push(byte[] data) {
 		BigQueueNodeHeader headerNode = readHeader();
 		if (0 == headerNode.getSize()) {
@@ -103,7 +126,7 @@ public class BigQueue {
 
 	public Optional<byte[]> pop() {
 		BigQueueNodeHeader headerNode = readHeader();
-		Optional<byte[]>retVal = null;
+		Optional<byte[]> retVal = null;
 		if (0 == headerNode.getSize()) {
 			return null;
 		} else {
@@ -117,6 +140,15 @@ public class BigQueue {
 		}
 		saveHeader(headerNode);
 		return retVal;
+	}
+
+	public long size() {
+		BigQueueNodeHeader headerNode = readHeader();
+		return headerNode.getSize();
+	}
+
+	public boolean hasNext() {
+		return size() > 0;
 	}
 
 	private class BigQueueNodeHeader implements Externalizable {
